@@ -1,0 +1,29 @@
+# Core Dependencies - Python 3.13 Compatible (Your existing versions)
+flask==3.0.0
+flask-cors==4.0.0
+flask-sqlalchemy==3.1.1
+psycopg[binary]==3.2.9
+requests==2.31.0
+beautifulsoup4==4.12.2
+python-dateutil==2.8.2
+
+# NLP - Using compatible versions
+nltk==3.8.1
+
+# Math libraries (since you're skipping scikit-learn)
+numpy>=2.1.1
+
+
+# Utilities (Your existing versions)
+python-dotenv==1.0.0
+urllib3==2.1.0
+
+# Development (Your existing versions)
+pytest==7.4.3
+black==23.12.1
+
+# Production (Your existing versions)
+gunicorn==21.2.0
+
+# Additional dependencies for the pipeline features
+sqlalchemy==2.0.23
