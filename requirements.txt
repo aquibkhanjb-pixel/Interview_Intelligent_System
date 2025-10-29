@@ -26,4 +26,5 @@ black==23.12.1
 gunicorn==21.2.0
 
 # Additional dependencies for the pipeline features
-sqlalchemy==2.0.23
+# SQLAlchemy 2.0.36+ required for Python 3.13 compatibility
+sqlalchemy>=2.0.36
