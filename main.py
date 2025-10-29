@@ -30,12 +30,27 @@ def create_app():
     
     # Initialize database
     db.init_app(app)
-    
+
     # Initialize database tables and seed data
     with app.app_context():
-        success = initialize_database(app, db)
-        if not success:
-            raise RuntimeError("Database initialization failed")
+        try:
+            success = initialize_database(app, db)
+            if not success:
+                print("WARNING: Database initialization had issues, but continuing...")
+                # In production, we'll create tables even if seeding fails
+                try:
+                    db.create_all()
+                    print("INFO: Database tables created successfully")
+                except Exception as e:
+                    print(f"ERROR: Failed to create tables: {e}")
+                    # Only raise in development
+                    if config_name == 'development':
+                        raise RuntimeError("Database initialization failed")
+        except Exception as e:
+            print(f"ERROR: Database initialization error: {e}")
+            # Only raise in development, allow production to continue
+            if config_name == 'development':
+                raise
     
     # Register routes with enhanced error handling
     routes_registered = False

@@ -34,6 +34,16 @@ class DatabaseManager:
     def _initialize_direct_connection(self):
         """Initialize direct SQLAlchemy connection for pipeline usage."""
         try:
+            # Determine if we need SSL (for production databases like Render)
+            connect_args = {
+                "options": "-c timezone=utc",
+                "connect_timeout": 30
+            }
+
+            # Add SSL for production databases (Render, AWS RDS, etc.)
+            if os.getenv('FLASK_ENV') == 'production' or 'render.com' in self.database_url:
+                connect_args["sslmode"] = "require"
+
             self.engine = create_engine(
                 self.database_url,
                 poolclass=QueuePool,
@@ -42,10 +52,7 @@ class DatabaseManager:
                 pool_pre_ping=True,
                 pool_recycle=3600,
                 echo=Config.DEBUG,
-                connect_args={
-                    "options": "-c timezone=utc",
-                    "connect_timeout": 30
-                }
+                connect_args=connect_args
             )
             
             self.SessionLocal = sessionmaker(

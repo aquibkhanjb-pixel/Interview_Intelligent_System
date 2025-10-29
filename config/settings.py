@@ -5,14 +5,31 @@ from dotenv import load_dotenv
 # Load environment variables from .env if it exists
 load_dotenv()
 
-class Config:
-    """Base configuration class."""
-    
-    # Database - psycopg 3.x format
-    DATABASE_URL = os.getenv(
+def get_database_url():
+    """
+    Get database URL and convert it to psycopg3 format.
+    Render provides postgres:// but psycopg3 needs postgresql://
+    """
+    database_url = os.getenv(
         'DATABASE_URL',
         os.getenv('SQLALCHEMY_DATABASE_URI', 'postgresql+psycopg://postgres:password@localhost:5432/interview_intel')
     )
+
+    # Convert postgres:// to postgresql:// (Render compatibility)
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+    # Ensure we're using psycopg (not psycopg2)
+    if database_url.startswith('postgresql://') and '+psycopg' not in database_url:
+        database_url = database_url.replace('postgresql://', 'postgresql+psycopg://', 1)
+
+    return database_url
+
+class Config:
+    """Base configuration class."""
+
+    # Database - psycopg 3.x format
+    DATABASE_URL = get_database_url()
     
     # Flask
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-key-change-in-production')
