@@ -15,12 +15,24 @@ def get_database_url():
         os.getenv('SQLALCHEMY_DATABASE_URI', 'postgresql+psycopg://postgres:password@localhost:5432/interview_intel')
     )
 
+    # Debug logging
+    import logging
+    logger = logging.getLogger(__name__)
+
+    if 'localhost' in database_url or '127.0.0.1' in database_url:
+        logger.warning("⚠️  WARNING: Using localhost database! DATABASE_URL environment variable not set properly!")
+        logger.warning("⚠️  Set DATABASE_URL in Render Dashboard to your PostgreSQL Internal Database URL")
+    else:
+        logger.info(f"✓ Using external database: {database_url.split('@')[1] if '@' in database_url else 'unknown'}")
+
     # Convert postgres:// to postgresql:// (Render compatibility)
     if database_url.startswith('postgres://'):
+        logger.info("Converting postgres:// to postgresql+psycopg://")
         database_url = database_url.replace('postgres://', 'postgresql://', 1)
 
     # Ensure we're using psycopg (not psycopg2)
     if database_url.startswith('postgresql://') and '+psycopg' not in database_url:
+        logger.info("Adding +psycopg to database URL")
         database_url = database_url.replace('postgresql://', 'postgresql+psycopg://', 1)
 
     return database_url
